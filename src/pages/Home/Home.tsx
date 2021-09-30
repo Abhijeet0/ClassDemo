@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { Button, TextField } from "@material-ui/core";
 import styled from "styled-components";
@@ -29,16 +29,67 @@ const Login = styled(Button)`
   }
 `;
 
+function validateEmail(email: string) {
+  //Validates the email address
+  var emailRegex = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+  return emailRegex.test(email);
+}
+
+function validatePhone(phone: string) {
+  //Validates the phone number
+  var phoneRegex = /^(\+91-|\+91|0)?\d{10}$/; // Change this regex based on requirement
+  return phoneRegex.test(phone);
+}
+
+function doValidate(username: string) {
+  if (!validateEmail(username) || !validatePhone(username)) {
+    // alert("Invalid Username");
+    return false;
+  }
+  return true;
+}
+
 function Home() {
+  const [nameError, setNameError] = useState(false);
+  const [nameErrorMsg, setNameErrorMsg] = useState("");
+  const [name, setName] = useState("");
+
   const history = useHistory();
-  const navigateToAbout = () => {
-    history.push("/about");
+
+  const onNameChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    setName(e.target.value);
+
+    console.log("name", name);
   };
+
+  const navigateToAbout = () => {
+    if (name === "") {
+      setNameError(true);
+      setNameErrorMsg("Please enter username");
+    } else if (!doValidate(name)) {
+      setNameError(true);
+      setNameErrorMsg("Invalid Username");
+    } else {
+      setNameError(false);
+      setNameErrorMsg("");
+      history.push("/about");
+    }
+  };
+
   return (
     <>
       <h2>Home</h2>
       <Wrapper>
-        <Name variant="outlined" label="Username" />
+        <Name
+          variant="outlined"
+          label="Username"
+          value={name}
+          onChange={onNameChange}
+          error={nameError}
+          helperText={nameErrorMsg}
+        />
         <Password variant="outlined" type="password" label="Password" />
         <Login variant="contained" onClick={navigateToAbout}>
           Login
