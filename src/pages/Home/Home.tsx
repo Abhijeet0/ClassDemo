@@ -32,39 +32,40 @@ const Login = styled(Button)`
 function validateEmail(email: string) {
   //Validates the email address
   var emailRegex = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+  console.log("email", emailRegex.test(email));
   return emailRegex.test(email);
 }
 
 function validatePhone(phone: string) {
   //Validates the phone number
   var phoneRegex = /^(\+91-|\+91|0)?\d{10}$/; // Change this regex based on requirement
+  console.log("phoneRegex.test(phone);", phoneRegex.test(phone));
   return phoneRegex.test(phone);
 }
 
 function doValidate(username: string) {
+  debugger;
   if (!validateEmail(username) || !validatePhone(username)) {
     // alert("Invalid Username");
-    return false;
+    return true;
   }
-  return true;
+  return false;
 }
 
 function Home() {
   const [nameError, setNameError] = useState(false);
   const [nameErrorMsg, setNameErrorMsg] = useState("");
   const [name, setName] = useState("");
-
   const history = useHistory();
 
   const onNameChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     setName(e.target.value);
-
-    console.log("name", name);
   };
 
   const navigateToAbout = () => {
+    // debugger;
     if (name === "") {
       setNameError(true);
       setNameErrorMsg("Please enter username");
