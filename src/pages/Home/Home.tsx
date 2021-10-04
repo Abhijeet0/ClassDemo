@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { Button, TextField } from "@material-ui/core";
 import styled from "styled-components";
+import axios from "axios";
 
 const Wrapper = styled.div`
   display: flex;
@@ -17,7 +18,7 @@ const Name = styled(TextField)`
     color: #2d819c;
   }
 `;
-const Password = styled(TextField)``;
+const Job = styled(TextField)``;
 const Login = styled(Button)`
   &.MuiButton-contained {
     background-color: #2d819c;
@@ -38,30 +39,63 @@ function validateEmail(email: string) {
 
 function validatePhone(phone: string) {
   //Validates the phone number
-  var phoneRegex = /^(\+91-|\+91|0)?\d{10}$/; // Change this regex based on requirement
-  console.log("phoneRegex.test(phone);", phoneRegex.test(phone));
+  var phoneRegex = /^\d{10}$/; ///^(\+91-|\+91|0)?\d{10}$/; // Change this regex based on requirement
   return phoneRegex.test(phone);
 }
 
 function doValidate(username: string) {
   debugger;
-  if (!validateEmail(username) || !validatePhone(username)) {
+  if (!validateEmail && !validatePhone(username)) {
     // alert("Invalid Username");
-    return true;
+    return false;
   }
-  return false;
+  return true;
+}
+
+function createUser(name: string, job: string) {
+  axios
+    .post("https://reqres.in/api/users", {
+      data: {
+        name,
+        job,
+      },
+    })
+    .then((result) => {
+      console.log("result", result.data);
+    });
 }
 
 function Home() {
   const [nameError, setNameError] = useState(false);
   const [nameErrorMsg, setNameErrorMsg] = useState("");
   const [name, setName] = useState("");
+  const [job, setJob] = useState("");
   const history = useHistory();
+  const [data, setData] = useState<any>();
+  useEffect(() => {
+    // fetch("https://jsonplaceholder.typicode.com/todos/1", { method: "GET" })
+    //   .then((response) => response.json())
+    //   .then((json) => {
+    //     setName(json.title);
+    //   });
+    axios
+      .get("https://jsonplaceholder.typicode.com/todos/1")
+      .then((response) => {
+        console.log("response", response.data);
+        setData(response.data);
+      });
+  }, []);
 
   const onNameChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     setName(e.target.value);
+  };
+
+  const onJobChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    setJob(e.target.value);
   };
 
   const navigateToAbout = () => {
@@ -75,6 +109,7 @@ function Home() {
     } else {
       setNameError(false);
       setNameErrorMsg("");
+      createUser(name, job);
       history.push("/about");
     }
   };
@@ -91,7 +126,12 @@ function Home() {
           error={nameError}
           helperText={nameErrorMsg}
         />
-        <Password variant="outlined" type="password" label="Password" />
+        <Job
+          variant="outlined"
+          label="Job"
+          value={job}
+          onChange={onJobChange}
+        />
         <Login variant="contained" onClick={navigateToAbout}>
           Login
         </Login>
